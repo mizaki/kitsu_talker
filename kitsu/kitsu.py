@@ -825,7 +825,7 @@ class KitsuTalker(ComicTalker):
             # It's possible that it's marked sfw and has a null age rating but has a isNsfw category
             if "R18" not in self.age_filter_range:
                 for cat in record["categories"].get("nodes", []):
-                    if cat.get("isNsfw"):
+                    if cat is not None and cat.get("isNsfw"):
                         return True
             return False
 
