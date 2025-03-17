@@ -1,0 +1,43 @@
+name: Generate Manifest on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  generate-manifest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed to commit manifest.yaml
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch all releases from GitHub API
+        run: |
+          curl -s https://api.github.com/repos/${{ github.repository }}/releases > releases.json
+
+      - name: Generate manifest.yaml
+        run: |
+          latest_version=$(jq -r '.[0].tag_name' releases.json)
+          echo "Latest release version: $latest_version"
+
+          echo "latest: $latest_version" > manifest.yaml
+          echo "downloads:" >> manifest.yaml
+
+          jq -r '
+            .[] | select(.prerelease == false) |
+            "  - version: \(.tag_name)\n    url: https://github.com/${{ github.repository }}/releases/download/\(.tag_name)/${{ github.event.repository.name }}-plugin-\(.tag_name).zip"
+          ' releases.json >> manifest.yaml
+
+          echo "Generated manifest.yaml:"
+          cat manifest.yaml
+
+      - name: Commit and push manifest.yaml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.yaml
+          git commit -m "Update manifest.yaml for release ${{ github.event.release.tag_name }}"
+          git push
