@@ -27,7 +27,7 @@ jobs:
           echo "downloads:" >> manifest.yaml
 
           jq -r '
-            .[] | select(.prerelease == false) |
+            map(select(.prerelease == false))[:5] |
             "  - version: \(.tag_name)\n    url: https://github.com/${{ github.repository }}/releases/download/\(.tag_name)/${{ github.event.repository.name }}-plugin-\(.tag_name).zip"
           ' releases.json >> manifest.yaml
 
