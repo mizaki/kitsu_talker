@@ -20,17 +20,23 @@ jobs:
 
       - name: Generate manifest.yaml
         run: |
-          latest_version=$(jq -r '.[0].tag_name' releases.json)
-          echo "Latest release version: $latest_version"
-
+          # Fetch all releases
+          curl -s https://api.github.com/repos/${{ github.repository }}/releases > releases.json
+      
+          # Extract latest release version
+          latest_version=$(jq -r 'map(select(.prerelease == false)) | .[0].tag_name' releases.json)
+          echo "Latest version: $latest_version"
+      
           echo "latest: $latest_version" > manifest.yaml
           echo "downloads:" >> manifest.yaml
-
+      
+          # Get last 5 non-prerelease releases
           jq -r '
             map(select(.prerelease == false))[:5] |
+            .[] |
             "  - version: \(.tag_name)\n    url: https://github.com/${{ github.repository }}/releases/download/\(.tag_name)/${{ github.event.repository.name }}-plugin-\(.tag_name).zip"
           ' releases.json >> manifest.yaml
-
+      
           echo "Generated manifest.yaml:"
           cat manifest.yaml
 
