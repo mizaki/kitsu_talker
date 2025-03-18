@@ -1,5 +1,9 @@
-latest: 0.0.3
+latest: 0.0.5
 downloads:
+  - version: 0.0.5
+    url: https://github.com/mizaki/kitsu_talker/releases/download/0.0.5/kitsu_talker-plugin-0.0.5.zip
+  - version: 0.0.4
+    url: https://github.com/mizaki/kitsu_talker/releases/download/0.0.4/kitsu_talker-plugin-0.0.4.zip
   - version: 0.0.3
     url: https://github.com/mizaki/kitsu_talker/releases/download/0.0.3/kitsu_talker-plugin-0.0.3.zip
   - version: 0.0.2
